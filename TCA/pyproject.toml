@@ -1,0 +1,23 @@
+[project]
+name = "tca"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "apscheduler>=3.10,<4",
+    "matplotlib>=3.10",
+    "python-dotenv>=1.0",
+    "numpy>=2.0",
+    "openpyxl>=3.1",
+    "pandas>=3.0.3",
+    "reportlab>=4.5.1",
+    "scipy>=1.17",
+    "scipy-stubs~=1.17.1",
+    "seaborn>=0.13",
+    "streamlit>=1.58.0",
+    "networkx>=3.6.1",
+    "scikit-learn>=1.9.0",
+    "dowhy>=0.14",
+    "tabulate>=0.10.0",
+    "pandas-stubs~=3.0.3",
+    "pytest>=9.0.3",
+]
