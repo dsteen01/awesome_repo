@@ -15,7 +15,8 @@ To generate a different report, swap in a different ReportConfig:
 """
 
 import logging
-from config import ReportConfig
+#from configs.xyz_strategy import config as cfg
+from configs.Evergreen import config as cfg
 from pipeline import run_report
 
 logging.basicConfig(
@@ -24,6 +25,5 @@ logging.basicConfig(
     datefmt='%H:%M:%S',
 )
 
-cfg    = ReportConfig()
 result = run_report(cfg)
 print(f"\nDone. Report saved to: {result.pdf_path.resolve()}")

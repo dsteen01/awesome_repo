@@ -24,7 +24,7 @@ class ReportConfig:
     # ------------------------------------------------------------------
     # I/O
     # ------------------------------------------------------------------
-    input_file: str = 'toydata_v2.xlsx'
+    input_file: str = 'data'
     output_file: str = 'TestFile.pdf'
     client_name: str = 'ClientName: XYZ'
 
@@ -78,14 +78,28 @@ class ReportConfig:
     #: Set to '%Y%m%d' when dates are stored as integers (e.g. 20240101).
     #: Set to '' to let pandas infer the format (works for ISO strings and
     #: proper Excel date cells).
-    date_format: str = '%Y%m%d'
+    date_format: str = ''
 
     # ------------------------------------------------------------------
     # Analysis parameters
     # ------------------------------------------------------------------
 
-    #: Time granularity for temporal charts. 'Daily' or 'Weekly'.
+    #: Time granularity for temporal charts. 'Daily', 'Weekly', or 'Monthly'.
     time_bin: str = 'Daily'
+
+    #: Column summed in the cover-page activity panel.
+    #: Defaults to None, which falls back to weighting[0] (executed notional).
+    #: Set to 'exec_qty' to show share volume instead.
+    activity_col: Optional[str] = None
+
+    #: Row-level filters applied before analysis: {column: value}.
+    #: e.g. {'client': 'XYZ'} restricts the dataset to XYZ trades only.
+    row_filters: dict = field(default_factory=dict)
+
+    #: If set, the pipeline splits the filtered data by unique values of this
+    #: column and produces one 2-page section per value in a single PDF.
+    #: e.g. 'strategy' → one section per strategy.
+    split_by: Optional[str] = None
 
     #: Number of quantile bins used in CutBy analysis.
     nbins: int = 5
@@ -110,8 +124,8 @@ class ReportConfig:
 
     #: Raw column names → display names applied before any analysis runs.
     rename_map: dict = field(default_factory=lambda: {
-        'ordre_len_seconds':       'Duration',
-        'liq_consumption':         'TradeRate',
+        'order_len_minutes':       'Duration',
+        'trade_rate':              'TradeRate',
         'arrival_mid_px_slp_bps':  'ArrSlipBps',
     })
 

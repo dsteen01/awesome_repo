@@ -17,7 +17,26 @@ import io
 
 from reportlab.lib import colors
 from reportlab.lib.units import inch
-from reportlab.platypus import Image, Paragraph, Table
+from reportlab.platypus import Flowable, Image, Paragraph, Table
+
+
+class SectionMarker(Flowable):
+    """Zero-height marker that carries a section label to MyDocTemplate.
+
+    Placing this as the first flowable in a section causes ``afterFlowable``
+    on ``MyDocTemplate`` to update the canvas's ``current_section``, which
+    ``PageNumCanvas`` then stamps in the top-right corner of every page via
+    its deferred-draw mechanism.
+    """
+
+    def __init__(self, section: str):
+        super().__init__()
+        self.section = section
+        self.width   = 0
+        self.height  = 0
+
+    def draw(self):
+        pass
 
 
 def df2table(df) -> Table:

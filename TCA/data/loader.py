@@ -4,9 +4,9 @@ data/loader.py — Source-file ingestion for the TCA pipeline.
 Functions
 ---------
 load_data(config)
-    Read the Excel source file, apply unit scaling, column renames, and date
-    parsing, then validate that every column referenced by the config is
-    present in the resulting DataFrame.
+    Read the source data (Hive-partitioned Parquet directory or Excel file),
+    apply unit scaling, column renames, and date parsing, then validate that
+    every column referenced by the config is present in the resulting DataFrame.
 
 _resolve_path(p)
     Resolve a relative path against the project root so the pipeline works
@@ -64,8 +64,13 @@ def load_data(config: ReportConfig) -> pd.DataFrame:
     if not path.exists():
         raise FileNotFoundError(f"Input file not found: {path}")
 
-    logger.info("Loading data from %s", path)
-    data = pd.read_excel(path)
+    if path.is_dir():
+        parquet_files = sorted(path.glob("**/*.parquet"))
+        logger.info("Loading %d Parquet file(s) from %s", len(parquet_files), path)
+        data = pd.read_parquet(parquet_files, engine="pyarrow")
+    else:
+        logger.info("Loading Excel file from %s", path)
+        data = pd.read_excel(path)
 
     # Unit scaling — applied before rename so keys match raw column names
     for col, factor in config.scale_multiply.items():

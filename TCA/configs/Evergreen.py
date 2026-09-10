@@ -1,5 +1,5 @@
 """
-configs/xyz_strategy.py — Report definition for the XYZ strategy.
+configs/Evergreen.py — Report definition for Evergreen Asset Management.
 
 The scheduler discovers this file automatically.  To add a new report,
 copy this file, rename it, and update the fields below.
@@ -8,8 +8,11 @@ copy this file, rename it, and update the fields below.
 from config import ReportConfig
 
 config = ReportConfig(
-    client_name='ClientName: XYZ',
-    output_file='reports/xyz_strategy.pdf',
+    client_name='ClientName: Evergreen',
+    output_file='reports/Evergreen.pdf',
+
+    row_filters={'client': 'Evergreen Asset Management'},
+    split_by='strategy',
 
     # Delivery
     recipients=[],              # e.g. ['trader@firm.com', 'pm@firm.com']

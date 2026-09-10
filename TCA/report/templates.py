@@ -14,6 +14,9 @@ PageNumCanvas
 
 from __future__ import annotations
 
+from copy import copy
+
+from reportlab.lib.enums import TA_RIGHT
 from reportlab.lib.pagesizes import landscape, letter
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch, mm
@@ -24,6 +27,8 @@ from reportlab.platypus import (
     PageTemplate,
     Paragraph,
 )
+
+from report.components import SectionMarker
 
 
 class MyDocTemplate(BaseDocTemplate):
@@ -100,6 +105,10 @@ class MyDocTemplate(BaseDocTemplate):
         header.wrapOn(canvas, self.header_frame.width, self.header_frame.height)
         header.drawOn(canvas, self.header_frame.x1, self.header_frame.y1)
 
+    def afterFlowable(self, flowable) -> None:
+        if isinstance(flowable, SectionMarker):
+            self.canv.current_section = flowable.section
+
     def _footer(self, canvas, doc) -> None:
         self.footer_style.alignment = 0
         dates  = f"Date Range: {self.start_date} - {self.end_date}"
@@ -123,6 +132,10 @@ class PageNumCanvas(canvas.Canvas):
     def __init__(self, *args, **kwargs):
         canvas.Canvas.__init__(self, *args, **kwargs)
         self.pages: list[dict] = []
+        self.current_section: str = ''
+        _s = copy(getSampleStyleSheet()['Title'])
+        _s.alignment = TA_RIGHT
+        self._section_style = _s
 
     def showPage(self) -> None:
         self.pages.append(dict(self.__dict__))
@@ -133,6 +146,7 @@ class PageNumCanvas(canvas.Canvas):
         for page in self.pages:
             self.__dict__.update(page)
             self._draw_page_number(page_count)
+            self._draw_section_label()
             canvas.Canvas.showPage(self)
         canvas.Canvas.save(self)
 
@@ -140,3 +154,12 @@ class PageNumCanvas(canvas.Canvas):
         label = f"Page {self._pageNumber} of {page_count}"
         self.setFont("Helvetica", 9)
         self.drawRightString(272 * mm, 8 * mm, label)
+
+    def _draw_section_label(self) -> None:
+        section = getattr(self, 'current_section', '')
+        if section:
+            p = Paragraph(section, self._section_style)
+            w = self._pagesize[0] - inch   # matches header_frame width
+            h = 0.5 * inch                 # matches header_frame height
+            p.wrapOn(self, w, h)
+            p.drawOn(self, 0.5 * inch, self._pagesize[1] - 0.5 * inch)

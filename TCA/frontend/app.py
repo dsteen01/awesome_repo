@@ -114,10 +114,11 @@ def _sidebar_saved() -> ReportConfig | None:
     st.divider()
     st.markdown('**Overrides**')
 
+    _BINS = ['Daily', 'Weekly', 'Monthly']
     time_bin = st.selectbox(
         'Time bin',
-        ['Daily', 'Weekly'],
-        index=0 if base.time_bin == 'Daily' else 1,
+        _BINS,
+        index=_BINS.index(base.time_bin) if base.time_bin in _BINS else 0,
         help='Granularity of the temporal CutBy charts.',
     )
     nbins = st.slider(
@@ -198,7 +199,7 @@ def _sidebar_custom() -> ReportConfig | None:
     st.divider()
     st.markdown('**Analysis**')
 
-    time_bin = st.selectbox('Time bin', ['Daily', 'Weekly'])
+    time_bin = st.selectbox('Time bin', ['Daily', 'Weekly', 'Monthly'])
     nbins    = st.slider('CutBy bins', min_value=3, max_value=10, value=5)
 
     st.divider()

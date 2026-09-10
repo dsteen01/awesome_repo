@@ -5,8 +5,8 @@ data/transforms.py — Column-level data transformations shared across
 Functions
 ---------
 resolve_time_grouping(df, time_bin, date_col)
-    Map a time-bin label ('Daily' / 'Weekly') to a concrete grouping column,
-    returning a safe copy of the DataFrame.
+    Map a time-bin label ('Daily' / 'Weekly' / 'Monthly') to a concrete
+    grouping column, returning a safe copy of the DataFrame.
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ def resolve_time_grouping(
 
     Args:
         df:       Source DataFrame.
-        time_bin: ``'Daily'`` or ``'Weekly'``.
+        time_bin: ``'Daily'``, ``'Weekly'``, or ``'Monthly'``.
         date_col: Name of the date column in *df*
                   (default ``'trade_date'``).
 
@@ -35,7 +35,7 @@ def resolve_time_grouping(
         Tuple of ``(DataFrame copy, grouping column name)``.
 
     Raises:
-        ValueError: If *time_bin* is not ``'Daily'`` or ``'Weekly'``.
+        ValueError: If *time_bin* is not ``'Daily'``, ``'Weekly'``, or ``'Monthly'``.
     """
     df = df.copy()
     if time_bin == 'Daily':
@@ -46,7 +46,12 @@ def resolve_time_grouping(
             (4 - df[date_col].dt.weekday).astype(int), unit='d'
         )
         return df, 'WeekEnding'
+    elif time_bin == 'Monthly':
+        df[date_col] = pd.to_datetime(df[date_col])
+        df['MonthStart'] = df[date_col].dt.to_period('M').dt.to_timestamp()
+        return df, 'MonthStart'
     else:
         raise ValueError(
-            f"Unknown time_bin value '{time_bin}'. Expected 'Daily' or 'Weekly'."
+            f"Unknown time_bin value '{time_bin}'. "
+            f"Expected 'Daily', 'Weekly', or 'Monthly'."
         )
